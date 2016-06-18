@@ -1,9 +1,14 @@
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -12,6 +17,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
@@ -24,10 +30,11 @@ public class Aken extends Application {
 	//Mängu akna ja töö korraldus:
 	
 	@Override
-	public void start(final Stage primaryStage) throws FileNotFoundException {
+	public void start(final Stage primaryStage) throws IOException {
 		
 		final BorderPane juur = new BorderPane();
 	    Group asjad = new Group();
+	    
 	    //teeme mängus osalejad
 	    final Mängija vend = new Mängija(6, 100, 10);
 		final Vastane õde = new Vastane(100, 16);
@@ -48,25 +55,20 @@ public class Aken extends Application {
 		sc.close();
 
 	    //teeme visuaalsed asjad	
-		Rectangle vend_pilt = new Rectangle(100, 150, stseen1.getWidth()/5, stseen1.getWidth()/5);
-		Image vennapilt=new Image("file:\\C:\\Users\\Diana\\oop\\Rühmatöö2\\src\\vend.png");
+		Image vennapilt=new Image("file:src\\vend.png");
 		ImageView ivend = new ImageView();
 		ivend.setImage(vennapilt);
-		ivend.setX(vend_pilt.getX());
-		ivend.setY(vend_pilt.getY()-40);
+		ivend.setX(100);
+		ivend.setY(110);
 		
-		Rectangle õde_pilt = new Rectangle(vend_pilt.getX()+200, vend_pilt.getY(), 100, 100);
-		Image õepilt = new Image("file:\\C:\\Users\\Diana\\oop\\Rühmatöö2\\src\\õde.png");
+		Image õepilt = new Image("file:src\\õde.png");
 		ImageView iõde = new ImageView();
 		iõde.setImage(õepilt);
-		iõde.setX(õde_pilt.getX());
-		iõde.setY(õde_pilt.getY()-40);
-		//iv1.setFitWidth();
-		//iv1.setFitHeight(õde_pilt.getWidth());
+		iõde.setX(ivend.getX()+200);
+		iõde.setY(ivend.getY());
 		
-		õde_pilt.setFill(Color.RED);
-		final Rectangle v_jaks = new Rectangle(vend_pilt.getX(), vend_pilt.getY()+vend_pilt.getHeight()+30, vend.getHp(), 30);
-		final Rectangle õ_jaks = new Rectangle(õde_pilt.getX(), õde_pilt.getY()+õde_pilt.getHeight()+30, õde_pilt.getWidth(), 30);
+		final Rectangle v_jaks = new Rectangle(ivend.getX(), ivend.getY()+stseen1.getWidth()/5+70, vend.getHp(), 30);
+		final Rectangle õ_jaks = new Rectangle(iõde.getX(), iõde.getY()+170, 100, 30);
 		v_jaks.setFill(Color.GREEN);
 		v_jaks.setStroke(Color.BLACK);
 		õ_jaks.setFill(Color.GREEN);
@@ -75,14 +77,12 @@ public class Aken extends Application {
 		//venna joogipudelid
 		ImageView[] pudelid = new ImageView[6];
 		final Group joogid = new Group();
-		Image pudelipilt= new Image("file:\\C:\\Users\\Diana\\oop\\Rühmatöö2\\src\\pudel.png");
+		Image pudelipilt= new Image("file:src\\pudel.png");
 		
 		for (int i = 0; i<6; i++) {
 			pudelid[i] =new ImageView();
-			new Rectangle(vend_pilt.getX()+i*30, v_jaks.getY()+60, 20, 40);
-			//pudelid[i].setFill(Color.BROWN);
 			pudelid[i].setImage(pudelipilt);
-			pudelid[i].setX(vend_pilt.getX()-5+i*30);
+			pudelid[i].setX(ivend.getX()-5+i*30);
 			pudelid[i].setY(v_jaks.getY()+30);
 			joogid.getChildren().add(pudelid[i]);
 			
@@ -98,47 +98,94 @@ public class Aken extends Application {
 				);
 		taust.setFont(Font.font("MV Boli", 12));
 		
-		//allaandmis, ründe ja kaitse nupud
-		Rectangle ründa = new Rectangle(õde_pilt.getX(), õ_jaks.getY()+õ_jaks.getHeight()+30, 40, 40);
-		Image ründepilt = new Image("file:\\C:\\Users\\Diana\\oop\\Rühmatöö2\\src\\ründa.png");
+		//erinevad nupud
+		Image ründepilt = new Image("file:src\\ründa.png");
 		ImageView iründa = new ImageView();
 		iründa.setImage(ründepilt);
-		iründa.setX(ründa.getX());
-		iründa.setY(ründa.getY()-10);
-		Rectangle kaitse = new Rectangle(õde_pilt.getX()+õde_pilt.getWidth()-40, õ_jaks.getY()+õ_jaks.getHeight()+30, 40, 40);
-		Image kaitsepilt = new Image("file:\\C:\\Users\\Diana\\oop\\Rühmatöö2\\src\\kaitse.png");
+		iründa.setX(iõde.getX());
+		iründa.setY(õ_jaks.getY()+õ_jaks.getHeight()+20);
+		
+		Image kaitsepilt = new Image("file:src\\kaitse.png");
 		ImageView ikaitse = new ImageView();
 		ikaitse.setImage(kaitsepilt);
-		ikaitse.setX(kaitse.getX());
-		ikaitse.setY(kaitse.getY()-10);
-		Rectangle lõpp = new Rectangle(kaitse.getX()+kaitse.getWidth()+30, kaitse.getY(), 50, 50); 
-		Image lõpupilt = new Image("file:\\C:\\Users\\Diana\\oop\\Rühmatöö2\\src\\lõpp.png");
+		ikaitse.setX(iõde.getX()+60);
+		ikaitse.setY(õ_jaks.getY()+õ_jaks.getHeight()+20);
+		 
+		Image lõpupilt = new Image("file:src\\lõpp.png");
 		ImageView ilõpp = new ImageView();
 		ilõpp.setImage(lõpupilt);
-		ilõpp.setX(lõpp.getX());
-		ilõpp.setY(lõpp.getY()-25);
-		ründa.setFill(Color.RED);
-		kaitse.setFill(Color.SKYBLUE);
-		//lõpp.setFill(Color.PURPLE);
+		ilõpp.setX(ikaitse.getX()+70);
+		ilõpp.setY(ikaitse.getY()-15);
 		
-		final Text ründe_txt = new Text(ründa.getX()+5, ründa.getY()-2, "ründa");
-		final Text kaitse_txt = new Text(kaitse.getX()+5, kaitse.getY()-2, "kaitse");
-		final Text l6putxt = new Text(lõpp.getX()+5, lõpp.getY()-2, "alistu");
-		final Text joomine_txt = new Text(ründa.getX()-150, ründa.getY()+60, "Jookide varu");
-		final Text õeraas = new Text(ründa.getX()+20, vend_pilt.getY()-5, "Õde");
-		final Text vennakene = new Text(ründa.getX()-150, õeraas.getY(), "Vend");
-		final Text elud_txt = new Text(ründa.getX()-90, v_elud.getY(), "Vastupanu jaks");
+		Image logipilt=new Image("file:src\\folder.png");
+		ImageView ilogi = new ImageView();
+		ilogi.setImage(logipilt);
+		ilogi.setX(ilõpp.getX()+25);
+		ilogi.setY(ilõpp.getY()-100);
+		
+		//nupp, mida ei tohi vajutada:
+		Image punanepilt=new Image("file:src\\nupp.png");
+		ImageView inupp=new ImageView();
+		inupp.setImage(punanepilt);
+		inupp.setX(ilõpp.getX());
+		inupp.setY(ilõpp.getY()-200);
 		
 		
 		//jooksev seis
-		final Text olukord = new Text(70, ründa.getY()+ründa.getHeight()+40, tekstid.get(7));
+		final Text olukord = new Text(70, iründa.getY()+90, tekstid.get(7));
 		olukord.setFont(Font.font("MV Boli", 12));
 		
 		asjad.getChildren().addAll(ivend, iõde, v_jaks, õ_jaks, iründa, ikaitse, ilõpp, õ_elud, v_elud, taust,
-				olukord);
+				olukord, ilogi, inupp);
 		juur.setCenter(asjad);
 		primaryStage.show();
 	    
+		//logi:
+		ilogi.setOnMousePressed(new EventHandler<MouseEvent>(){
+			public void handle(MouseEvent mex) {
+				int võite=0, kaotusi=0, allaandmisi=0;
+				try{
+					java.io.File fail = new java.io.File("logi.txt");
+					java.util.Scanner sc = new java.util.Scanner(fail);
+					
+					while (sc.hasNextLine()) {
+						String rida = sc.nextLine();
+						if (rida.equals("võit")){
+							võite++;
+							}
+						else if (rida.equals("kaotus")){
+							kaotusi++;
+							}
+						else if (rida.equals("allaandmine")){
+							allaandmisi++;
+							}
+						}
+					sc.close();
+					}
+				catch(FileNotFoundException e){
+					System.out.println(e);
+					}
+				
+				final Text tvõit = new Text(100, 100, "Võite: "+võite);
+				tvõit.setFont(Font.font("MV Boli", 12));
+				final Text tkaotus = new Text(100, 100, "Kaotuseid: "+kaotusi);
+				tkaotus.setFont(Font.font("MV Boli", 12));
+				final Text taa = new Text(100, 100, "Allaandmisi: "+allaandmisi);
+				taa.setFont(Font.font("MV Boli", 12));
+				
+			    final Stage logi = new Stage();
+			    VBox vBox = new VBox(10);
+		        vBox.setAlignment(Pos.CENTER);
+		        vBox.getChildren().addAll(tvõit, tkaotus, taa);
+		 
+		        //stseeni loomine ja näitamine
+		        Scene stseen3 = new Scene(vBox);
+		        logi.setScene(stseen3);
+		        logi.show();
+		    }
+		}
+		);
+		
 		//joomisel:
 		joogid.setOnMousePressed(new EventHandler<MouseEvent>() {
 	    	public void handle(MouseEvent mex) {
@@ -173,7 +220,9 @@ public class Aken extends Application {
 						õde.setHp(õde.getHp()-vend.getStr()/2);
 						olukord.setText(tekstid.get(16));
 						surmaKontroll(õde, olukord, tekstid, õ_jaks, õ_elud);
-						if (mängLäbi){sulge(juur, primaryStage);}
+						if (mängLäbi){
+							logitäitmine("võit");
+							sulge(juur, primaryStage);}
 						
 					}
 					else {
@@ -186,14 +235,18 @@ public class Aken extends Application {
 						õde.setHp(õde.getHp()-vend.getStr());
 						olukord.setText(tekstid.get(18));
 						surmaKontroll(õde, olukord, tekstid, õ_jaks, õ_elud);
-						if (mängLäbi){sulge(juur, primaryStage);}
+						if (mängLäbi){
+							logitäitmine("võit");
+							sulge(juur, primaryStage);}
 						
 					}
 					else {
 						vend.setHp(vend.getHp()-õde.getStr());
 						olukord.setText(tekstid.get(19));
 						surmaKontroll(vend, olukord, tekstid, v_jaks, v_elud);
-						if (mängLäbi){sulge(juur, primaryStage);}
+						if (mängLäbi){
+							logitäitmine("kaotus");
+							sulge(juur, primaryStage);}
 						
 					}
 				}
@@ -214,9 +267,9 @@ public class Aken extends Application {
 						vend.setHp(vend.getHp()-õde.getStr()/2);
 						olukord.setText(tekstid.get(14));
 						surmaKontroll(vend, olukord, tekstid, v_jaks, v_elud);
-						if (mängLäbi){sulge(juur, primaryStage);}
-						//v_jaks.setWidth(vend.getHp());
-						//v_elud.setText(vend.getHp()+"");
+						if (mängLäbi){
+							logitäitmine("kaotus");
+							sulge(juur, primaryStage);}
 					}
 					else {
 						olukord.setText(tekstid.get(15));
@@ -233,7 +286,19 @@ public class Aken extends Application {
 				olukord.setUnderline(true);
 				olukord.setFill(Color.RED);
 				mängLäbi=true;
+				logitäitmine("allaandmine");
 				sulge(juur, primaryStage);
+		}
+		});
+		
+		//kui vajutatakse punast nuppu:
+		inupp.setOnMousePressed(new EventHandler<MouseEvent>(){
+			public void handle(MouseEvent mex) {
+				try {
+					throw new PunaneNuppErind();
+				} catch (PunaneNuppErind e) {
+					olukord.setText("Oli ju jutt, et seda nuppu ei vajuta!");
+				}
 		}
 		});
 		
@@ -245,6 +310,8 @@ public class Aken extends Application {
 		    	}
 		    }
 		});
+		
+		
 		
 	}
 	//mõned meetodid, et koodi lühendada
@@ -264,9 +331,19 @@ public class Aken extends Application {
 		else{
 		v_jaks.setWidth(vend.getHp());
 		v_elud.setText(vend.getHp()+"");}
+		
 	}
 	
-	//sulgeb akna kuhugi vajutamisel
+	//logi täitmine
+	public static void logitäitmine(String txt){
+		try {
+		    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("logi.txt", true)));
+		    out.println(txt);
+		    out.close();
+		} catch (IOException e) {}
+	}
+	
+	//sulgeb akna kuhugi vajutamisel 
 	public static void sulge(BorderPane aken, final Stage stage) {
 		aken.setOnMousePressed(new EventHandler<MouseEvent>() { 
 		    public void handle(MouseEvent mex) {
@@ -275,6 +352,7 @@ public class Aken extends Application {
 		});
 	
 	}
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
